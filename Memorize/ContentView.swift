@@ -9,15 +9,18 @@ import SwiftUI
 
 struct ContentView: View {
     
-    var emojis = ["🚗", "🚕","🚙","🚌","🚎","🏎","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋"]
+    @State var emojis = ["🚗", "🚕","🚙","🚌","🚎","🏎","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋"]
     
-    @State var emojiCount = 20
+    @State var emojiCount = 8
     
     var body: some View {
         VStack {
+            Text("Memorize!")
+                .font(.largeTitle)
+                .padding(.bottom)
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
+                    ForEach(emojis[0..<emojis.count], id: \.self) { emoji in
                         CardView(content: emoji)
                             .aspectRatio(2/3, contentMode: .fit)
                     }
@@ -25,10 +28,12 @@ struct ContentView: View {
             }
             .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
             Spacer()
-            HStack {
-                remove
+            HStack(alignment: .bottom) {
+                cars
                 Spacer()
-                add
+                flags
+                Spacer()
+                faces
             }
             .font(/*@START_MENU_TOKEN@*/.largeTitle/*@END_MENU_TOKEN@*/)
             .padding(.horizontal)
@@ -37,23 +42,43 @@ struct ContentView: View {
         .padding(.horizontal)
     }
     
-    var remove: some View {
+    var cars: some View {
         Button {
-            if emojiCount > 1 {
-                emojiCount -= 1
-            }
+            emojis = ["🚗", "🚕","🚙","🚌","🚎","🏎","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋"]
+            emojis.shuffle()
         } label: {
-            Image(systemName: "minus.circle")
+            VStack{
+                Image(systemName: "car")
+                Text("Vehicles")
+                    .font(.body)
+            }
         }
     }
     
-    var add: some View {
+    var flags: some View {
         Button {
-            if emojiCount < emojis.count {
-                emojiCount += 1
-            }
+            emojis = ["🏳️", "🏴", "🏴‍☠️", "🏁", "🚩", "🏳️‍🌈", "🏳️‍⚧️", "🇺🇳","🇦🇫", "🇦🇽"]
+            emojis.shuffle()
         } label: {
-            Image(systemName: "plus.circle")
+            VStack{
+                Image(systemName: "flag")
+                Text("Flags")
+                    .font(.body)
+            }
+        }
+    }
+    
+    var faces: some View {
+        Button {
+            emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "🥲", "☺️"]
+            emojis.shuffle()
+        } label: {
+            VStack{
+                Image(systemName: "face.smiling")
+                Text("faces")
+                    .font(.body)
+            }
+            
         }
     }
 }
@@ -82,7 +107,6 @@ struct CardView: View {
         .onTapGesture {
             isFaceUp = !isFaceUp
         }
-        
     }
 }
 
@@ -96,6 +120,7 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .previewInterfaceOrientation(.portraitUpsideDown)
             .preferredColorScheme(.dark)
         ContentView()
             .preferredColorScheme(.light)
