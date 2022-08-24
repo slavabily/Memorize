@@ -9,103 +9,44 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var emojis = ["🚗", "🚕","🚙","🚌","🚎","🏎","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋"]
-    
-    @State var emojiCount = 8
+    @ObservedObject var viewModel: EmojiMemoryGame
     
     var body: some View {
-        VStack {
-            Text("Memorize!")
-                .font(.largeTitle)
-                .padding(.bottom)
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(emojis[0..<emojis.count], id: \.self) { emoji in
-                        CardView(content: emoji)
-                            .aspectRatio(2/3, contentMode: .fit)
-                    }
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                ForEach(viewModel.cards) { card in
+                    CardView(card: card)
+                        .aspectRatio(2/3, contentMode: .fit)
+                        .onTapGesture {
+                            viewModel.choose(card)
+                        }
                 }
             }
-            .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
-            Spacer()
-            HStack(alignment: .bottom) {
-                cars
-                Spacer()
-                flags
-                Spacer()
-                faces
-            }
-            .font(/*@START_MENU_TOKEN@*/.largeTitle/*@END_MENU_TOKEN@*/)
-            .padding(.horizontal)
-            
         }
+        .foregroundColor(/*@START_MENU_TOKEN@*/.red/*@END_MENU_TOKEN@*/)
         .padding(.horizontal)
-    }
-    
-    var cars: some View {
-        Button {
-            emojis = ["🚗", "🚕","🚙","🚌","🚎","🏎","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋"]
-            emojis.shuffle()
-        } label: {
-            VStack{
-                Image(systemName: "car")
-                Text("Vehicles")
-                    .font(.body)
-            }
-        }
-    }
-    
-    var flags: some View {
-        Button {
-            emojis = ["🏳️", "🏴", "🏴‍☠️", "🏁", "🚩", "🏳️‍🌈", "🏳️‍⚧️", "🇺🇳","🇦🇫", "🇦🇽"]
-            emojis.shuffle()
-        } label: {
-            VStack{
-                Image(systemName: "flag")
-                Text("Flags")
-                    .font(.body)
-            }
-        }
-    }
-    
-    var faces: some View {
-        Button {
-            emojis = ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "🥲", "☺️"]
-            emojis.shuffle()
-        } label: {
-            VStack{
-                Image(systemName: "face.smiling")
-                Text("faces")
-                    .font(.body)
-            }
-            
-        }
     }
 }
 
 struct CardView: View {
-    var content: String
-    
-    @State var isFaceUp: Bool = true
+    let card: MemoryGame<String>.Card
     
     var body: some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: 20)
-            if isFaceUp {
+            if card.isFaceUp {
                 shape
                     .fill()
                     .foregroundColor(/*@START_MENU_TOKEN@*/.white/*@END_MENU_TOKEN@*/)
                 shape
                     .strokeBorder(lineWidth: 3)
-                Text(content)
+                Text(card.content)
                     .font(.largeTitle)
+            } else if card.isMatched {
+                shape.opacity(0)
             } else {
-                shape
-                    .fill()
+                shape.fill()
             }
-        }
-        .onTapGesture {
-            isFaceUp = !isFaceUp
         }
     }
 }
@@ -119,10 +60,10 @@ struct CardView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-            .previewInterfaceOrientation(.portraitUpsideDown)
+        let game = EmojiMemoryGame()
+        ContentView(viewModel: game)
             .preferredColorScheme(.dark)
-        ContentView()
+        ContentView(viewModel: game)
             .preferredColorScheme(.light)
     }
 }
